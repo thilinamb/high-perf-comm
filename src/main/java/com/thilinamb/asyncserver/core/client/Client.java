@@ -24,7 +24,7 @@ public class Client {
     private Selector selector;
     private final String serverHost;
     private final int serverPort;
-    private final int messageRate;
+    private final int workerCount;
     private SocketChannel socketChannel;
     private WriteWorker writeWorker;
     private ReadWorker readWorker;
@@ -32,10 +32,10 @@ public class Client {
 
     private Logger logger = LogManager.getLogger(Client.class);
 
-    public Client(String serverHost, int serverPort, int messageRate) {
+    public Client(String serverHost, int serverPort, int workerCount) {
         this.serverHost = serverHost;
         this.serverPort = serverPort;
-        this.messageRate = messageRate;
+        this.workerCount = workerCount;
     }
 
 
@@ -56,8 +56,12 @@ public class Client {
             logger.info("Successfully connected to " + socketAddress);
 
             // start the write worker thread.
-            writeWorker = new WriteWorker(1000/messageRate, socketChannel);
+            writeWorker = new WriteWorker(socketChannel);
             writeWorker.start();
+
+            // create and start the PayloadGenerator
+            PayloadGenerator payloadGen = new PayloadGenerator(writeWorker);
+            payloadGen.start();
 
             // start the read worker
             readWorker = new ReadWorker(socketChannel);
@@ -137,10 +141,10 @@ public class Client {
         // parse the input arguments.
         String serverHost = args[0];
         int port = Integer.parseInt(args[1]);
-        int messageRate = Integer.parseInt(args[2]);
+        int workerCount = Integer.parseInt(args[2]);
 
         // Create the client instance and initialize
-        Client client = new Client(serverHost, port, messageRate);
+        Client client = new Client(serverHost, port, workerCount);
         boolean initStatus = client.initialize();
 
         // Check the initialization status.

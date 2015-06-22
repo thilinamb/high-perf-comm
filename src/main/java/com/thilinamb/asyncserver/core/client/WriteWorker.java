@@ -7,8 +7,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Author: Thilina
@@ -16,24 +17,19 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class WriteWorker extends Thread {
 
-    private final int sleepInterval;
     private final SocketChannel socketChannel;
     private ByteBuffer byteBuffer;
 
-    private AtomicLong counter = new AtomicLong();
-    private AtomicLong data = new AtomicLong();
-
     private final Logger logger = LogManager.getLogger(WriteWorker.class);
 
-    private String[] messagePool = new String[]{"Hello!", "Hello World!", "Ayubowan!", "Arbitrary Message!"};
-    private Random random = new Random();
+    private Lock lock;
+    private Condition condition;
 
-    private long lastTimeStamp = 0;
-
-    public WriteWorker(int sleepInterval, SocketChannel channel) {
-        this.sleepInterval = sleepInterval;
+    public WriteWorker( SocketChannel channel) {
         this.socketChannel = channel;
         byteBuffer = ByteBuffer.allocate(1024 * 8);
+        lock = new ReentrantLock();
+        this.condition = lock.newCondition();
     }
 
     @Override
@@ -42,34 +38,33 @@ public class WriteWorker extends Thread {
             synchronized (this) {
                 try {
                     wait();
-
-                    if(lastTimeStamp == 0){
-                        lastTimeStamp = System.currentTimeMillis();
-                    }
-
-                    if (byteBuffer.position() == 0) {
-                        final byte[] payload = messagePool[random.nextInt(4)].getBytes();
-                        byteBuffer.putInt(payload.length);
-                        data.getAndAdd(payload.length);
-                        byteBuffer.put(payload);
-                        byteBuffer.flip();
-                    }
-                    socketChannel.write(byteBuffer);
-                    if (!byteBuffer.hasRemaining()) {
-                        byteBuffer.clear();
-                        if(logger.isDebugEnabled()){
-                            logger.debug("Sent a message to " + socketChannel.getRemoteAddress());
+                    lock.lock();
+                        if(byteBuffer.remaining() < byteBuffer.capacity()){
+                            byteBuffer.flip();
+                            socketChannel.write(byteBuffer);
+                            if(!byteBuffer.hasRemaining()){
+                                byteBuffer.clear();
+                            } else {
+                                byteBuffer.compact();
+                            }
+                            condition.signalAll();
+                        } else {
+                            condition.await();
                         }
-                        counter.getAndIncrement();
-                        if(counter.get() % 100000 == 0){
-                            long timeNow = System.currentTimeMillis();
-                            logger.info("Sent " + 100000 + " messages in " + (timeNow - lastTimeStamp) + "ms. " +
-                                    "Throughput: " + ((double)100000*1000)/(timeNow - lastTimeStamp) +
-                                    ", Data Rate(KB/s):" + ((data.get()*1000)/((1024)*(timeNow - lastTimeStamp))));
-                            data.set(0);
-                            lastTimeStamp = timeNow;
+                        /*if (byteBuffer.position() == 0) {
+                            final byte[] payload = messagePool[random.nextInt(4)].getBytes();
+                            byteBuffer.putInt(payload.length);
+                            messageSize = payload.length;
+                            byteBuffer.put(payload);
+                            byteBuffer.flip();
                         }
-                    }
+                        socketChannel.write(byteBuffer);
+                        if (!byteBuffer.hasRemaining()) {
+                            byteBuffer.clear();
+                            if(logger.isDebugEnabled()){
+                                logger.debug("Sent a message to " + socketChannel.getRemoteAddress());
+                            }
+                        }*/
                     // ensure the message rate
                     //Thread.sleep(sleepInterval);
                 } catch (InterruptedException e) {
@@ -81,6 +76,8 @@ public class WriteWorker extends Thread {
                     } catch (IOException ignore) {
                         // ignore
                     }
+                } finally {
+                    lock.unlock();
                 }
             }
         }
@@ -88,5 +85,23 @@ public class WriteWorker extends Thread {
 
     public synchronized void wakeUp(){
         this.notify();
+    }
+
+    public void addPayload(byte[] payload){
+        try {
+            lock.lock();
+            while (byteBuffer.remaining() < (payload.length + 4)){
+                try {
+                    condition.await();
+                } catch (InterruptedException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+            byteBuffer.putInt(payload.length).put(payload);
+            StatCollector.getInstance().updateSentStats(payload.length);
+            condition.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 }
