@@ -11,8 +11,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,7 +26,6 @@ public class Client {
     private SocketChannel socketChannel;
     private WriteWorker writeWorker;
     private ReadWorker readWorker;
-    private List<String> hashCodes = new LinkedList<String>();
 
     private Logger logger = LogManager.getLogger(Client.class);
 
@@ -37,7 +34,6 @@ public class Client {
         this.serverPort = serverPort;
         this.buffSize = buffSize;
     }
-
 
     public boolean initialize() {
         try {
