@@ -27,7 +27,7 @@ public class ChannelWriterDataHolder {
                 }
             }
             byteBuffer.putInt(payload.length).put(payload);
-            StatCollector.getInstance().updateSentStats(payload.length);
+            StatCollector.getInstance().updateStatistics(payload.length);
             this.notifyAll();
             //System.out.println("Done writing. Released lock!");
         }

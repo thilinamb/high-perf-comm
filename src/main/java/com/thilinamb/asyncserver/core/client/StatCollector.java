@@ -45,7 +45,7 @@ public class StatCollector {
         }
     }
 
-    public void updateSentStats(long bytes){
+    public void updateStatistics(long bytes){
         sentBytes.addAndGet(bytes);
         incrementCounter();
     }

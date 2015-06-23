@@ -1,6 +1,7 @@
 package com.thilinamb.asyncserver.core.task;
 
 import com.thilinamb.asyncserver.core.SocketChannelDataHolder2;
+import com.thilinamb.asyncserver.core.client.StatCollector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,6 +56,7 @@ public class ChannelReaderTask2 extends Task {
                 if ((bufferContentLength - dataBuffer.position()) >= (messageLength - currentOffset)) {
                     // read the complete message
                     dataBuffer.get(currentMessage, currentOffset, (messageLength - currentOffset));
+                    StatCollector.getInstance().updateStatistics(messageLength);
                     // prepare for the next message
                     dataHolder.setMessageOffSet(0);
                     dataHolder.setMessageSize(-1);

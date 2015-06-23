@@ -98,7 +98,7 @@ public class WriteWorker extends Thread {
                 }
             }
             byteBuffer.putInt(payload.length).put(payload);
-            StatCollector.getInstance().updateSentStats(payload.length);
+            StatCollector.getInstance().updateStatistics(payload.length);
             condition.signalAll();
         } finally {
             lock.unlock();
