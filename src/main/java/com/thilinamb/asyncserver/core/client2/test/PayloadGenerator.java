@@ -18,7 +18,7 @@ public class PayloadGenerator implements Runnable {
     }
 
     public byte[] getRandomPayload(){
-        byte[] bytes = new byte[1024*1];
+        byte[] bytes = new byte[200];
         random.nextBytes(bytes);
         return bytes;
     }
