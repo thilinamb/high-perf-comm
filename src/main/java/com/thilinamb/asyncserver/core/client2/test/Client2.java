@@ -22,7 +22,7 @@ public class Client2 {
         String serverHost = args[0];
         int port = Integer.parseInt(args[1]);
         int clientThreadCount = Integer.parseInt(args[2]);
-        int buffSizeInMB = Integer.parseInt(args[3]);
+        int payLoadGenerators = Integer.parseInt(args[3]);
 
         try {
             ClientIOThread ioThread = new ClientIOThread(clientThreadCount);
@@ -38,7 +38,9 @@ public class Client2 {
                 }
             }
             System.out.println("Starting to generated load..");
-            new Thread(new PayloadGenerator(dataHolder)).start();
+            for (int i = 0; i < payLoadGenerators; i++) {
+                new Thread(new PayloadGenerator(dataHolder)).start();
+            }
 
             try {
                 Thread.sleep(60 * 60 * 1000);
