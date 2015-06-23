@@ -9,19 +9,24 @@ public class PayloadGenerator extends Thread{
 
     private final WriteWorker writeWorker;
 
-    private String[] messagePool = new String[]{"Hello!", "Hello World!", "Ayubowan!", "Arbitrary Message!"};
-    private Random random = new Random();
-
+    private Random random;
 
     public PayloadGenerator(WriteWorker writeWorker) {
         super();
         this.writeWorker = writeWorker;
+        random = new Random();
+    }
+
+    public byte[] getRandomPayload(){
+        byte[] bytes = new byte[1024*100];
+        random.nextBytes(bytes);
+        return bytes;
     }
 
     @Override
     public void run() {
         while (true){
-            writeWorker.addPayload(messagePool[random.nextInt(messagePool.length)].getBytes());
+            writeWorker.addPayload(getRandomPayload());
         }
     }
 }

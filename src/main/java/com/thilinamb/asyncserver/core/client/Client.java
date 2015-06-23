@@ -24,7 +24,7 @@ public class Client {
     private Selector selector;
     private final String serverHost;
     private final int serverPort;
-    private final int workerCount;
+    private final int buffSize;
     private SocketChannel socketChannel;
     private WriteWorker writeWorker;
     private ReadWorker readWorker;
@@ -32,10 +32,10 @@ public class Client {
 
     private Logger logger = LogManager.getLogger(Client.class);
 
-    public Client(String serverHost, int serverPort, int workerCount) {
+    public Client(String serverHost, int serverPort, int buffSize) {
         this.serverHost = serverHost;
         this.serverPort = serverPort;
-        this.workerCount = workerCount;
+        this.buffSize = buffSize;
     }
 
 
@@ -56,7 +56,7 @@ public class Client {
             logger.info("Successfully connected to " + socketAddress);
 
             // start the write worker thread.
-            writeWorker = new WriteWorker(socketChannel);
+            writeWorker = new WriteWorker(socketChannel, buffSize);
             writeWorker.start();
 
             // create and start the PayloadGenerator
@@ -133,7 +133,7 @@ public class Client {
         // Check if the required arguments are provided.
         if (args.length < 3) {
             if (args.length < 3) {
-                System.out.println("Usage <server-hostname> <port> <message-rate>");
+                System.out.println("Usage <server-hostname> <port> <buffSize>");
                 System.exit(-1);
             }
         }
@@ -141,10 +141,10 @@ public class Client {
         // parse the input arguments.
         String serverHost = args[0];
         int port = Integer.parseInt(args[1]);
-        int workerCount = Integer.parseInt(args[2]);
+        int buffSize = Integer.parseInt(args[2]);
 
         // Create the client instance and initialize
-        Client client = new Client(serverHost, port, workerCount);
+        Client client = new Client(serverHost, port, buffSize);
         boolean initStatus = client.initialize();
 
         // Check the initialization status.

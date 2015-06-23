@@ -25,9 +25,9 @@ public class WriteWorker extends Thread {
     private Lock lock;
     private Condition condition;
 
-    public WriteWorker( SocketChannel channel) {
+    public WriteWorker( SocketChannel channel, int byteBufferSizeInMb) {
         this.socketChannel = channel;
-        byteBuffer = ByteBuffer.allocate(1024 * 8);
+        byteBuffer = ByteBuffer.allocate(1024 * 1024 * byteBufferSizeInMb);
         lock = new ReentrantLock();
         this.condition = lock.newCondition();
     }
