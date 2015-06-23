@@ -37,7 +37,7 @@ public class StatCollector {
                     long timeElapsed = currentTimeStamp - previousTimeStamp;
                     logger.info("Sent " + 100000 + " messages in " + timeElapsed + "ms. " +
                             "Throughput: " + ((double)100000*1000)/timeElapsed +
-                            ", Data Rate(KB/s):" + ((sentBytes.get()*1000)/((1024)*timeElapsed)));
+                            ", Data Rate(KB/s):" + ((sentBytes.get()*1000)/((1024*1024)*timeElapsed)));
                     sentBytes.set(0);
                     previousTimeStamp = currentTimeStamp;
                 }
