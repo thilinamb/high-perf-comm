@@ -29,8 +29,7 @@ public class StatCollector {
 
     private void incrementCounter(){
         synchronized (this) {
-            long count = sentCounter.incrementAndGet();
-            if(count % 100000 == 0){
+            if(sentCounter.getAndIncrement() % 100000 == 0){
                 if(previousTimeStamp == -1){
                     previousTimeStamp = System.currentTimeMillis();
                 } else {
