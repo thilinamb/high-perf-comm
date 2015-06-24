@@ -16,6 +16,7 @@ public class StatCollector {
 
     private AtomicLong sentCounter = new AtomicLong(0);
     private AtomicLong sentBytes = new AtomicLong(0);
+    public static final int limit = 10000000;
 
     private long previousTimeStamp = -1;
 
@@ -29,15 +30,15 @@ public class StatCollector {
 
     private void incrementCounter(){
         synchronized (this) {
-            if(sentCounter.getAndIncrement() % 100000 == 0){
+            if(sentCounter.getAndIncrement() % limit == 0){
                 if(previousTimeStamp == -1){
                     previousTimeStamp = System.currentTimeMillis();
                 } else {
                     long currentTimeStamp = System.currentTimeMillis();
                     long timeElapsed = currentTimeStamp - previousTimeStamp;
-                    logger.info("Sent " + 100000 + " messages in " + timeElapsed + "ms. " +
-                            "Throughput: " + ((double)100000*1000)/timeElapsed +
-                            ", Data Rate(KB/s):" + ((sentBytes.get()*1000)/((1024*1024)*timeElapsed)));
+                    logger.info("Sent " + limit + " messages in " + timeElapsed + "ms. " +
+                            "Throughput: " + ((double)limit*1000)/timeElapsed +
+                            ", Data Rate(MB/s):" + ((sentBytes.get()*1000)/((1024*1024)*timeElapsed)));
                     sentBytes.set(0);
                     previousTimeStamp = currentTimeStamp;
                 }
