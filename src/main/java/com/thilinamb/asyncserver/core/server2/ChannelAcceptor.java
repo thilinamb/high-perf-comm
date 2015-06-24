@@ -88,7 +88,7 @@ public class ChannelAcceptor implements Runnable {
 
                         SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
                         if (socketChannel != null) {
-                            lastAssignedReactor = lastAssignedReactor++ % ioReactors.length;
+                            lastAssignedReactor = ++lastAssignedReactor % ioReactors.length;
                             IOReactor ioReactor = ioReactors[lastAssignedReactor];
                             ioReactor.registerSocketChannel(socketChannel);
                         }
