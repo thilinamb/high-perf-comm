@@ -10,10 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -25,7 +22,7 @@ public class IOReactor implements Runnable {
     private final Selector selector;
     private final int reactorId;
 
-    private final List<SocketChannel> unprocessedChannels = new ArrayList<>();
+    private final List<SocketChannel> unprocessedChannels = Collections.synchronizedList(new ArrayList<SocketChannel>());
 
     public IOReactor(int reactorId) throws IOException {
         this.reactorId = reactorId;
@@ -40,7 +37,10 @@ public class IOReactor implements Runnable {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            processNewChannels();
+            if(!unprocessedChannels.isEmpty()) {
+                processNewChannels();
+            }
+
             int numOfKeys = 0;
 
             try {
