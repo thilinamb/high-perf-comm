@@ -24,7 +24,7 @@ public class ChannelConnector implements Runnable {
         private final Selector selector;
 
         private final Map<String, ChannelWriterDataHolder> connections = new ConcurrentHashMap<>();
-        private final IOReactor[] ioReactors;
+        private final IOReactor2[] ioReactors;
         private int lastUsedReactor = 0;
 
         private class PendingConnection {
@@ -42,10 +42,10 @@ public class ChannelConnector implements Runnable {
         public ChannelConnector(int reactorCount) throws IOException {
             try {
                 selector = Selector.open();
-                ioReactors = new IOReactor[reactorCount];
+                ioReactors = new IOReactor2[reactorCount];
 
                 for(int i = 0; i < reactorCount; i++){
-                    IOReactor reactor = new IOReactor();
+                    IOReactor2 reactor = new IOReactor2();
                     Thread reactorThread = new Thread(reactor);
                     reactorThread.setName("WriterIOReactor-" + i);
                     reactorThread.start();
@@ -112,7 +112,7 @@ public class ChannelConnector implements Runnable {
             if (channel.finishConnect()) {
                 PendingConnection pendingConnection = (PendingConnection)key.attachment();
                 ChannelWriterDataHolder dataHolder = new ChannelWriterDataHolder();
-                IOReactor reactor = ioReactors[lastUsedReactor++ % ioReactors.length];
+                IOReactor2 reactor = ioReactors[lastUsedReactor++ % ioReactors.length];
                 reactor.registerChannel(pendingConnection.socketChannel, dataHolder);
                 connections.put(pendingConnection.hostName + ":" + pendingConnection.port, dataHolder);
                 // deregister
