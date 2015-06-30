@@ -13,6 +13,16 @@
     <artifactId>highperfcomm.netty</artifactId>
     <packaging>jar</packaging>
 
+    <build>
+     <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.2.3.Final</version>
+      </extension>
+     </extensions>
+   </build>    
+
     <dependencies>
         <dependency>
             <groupId>io.netty</groupId>
@@ -22,6 +32,12 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
         </dependency>
+	<dependency>
+      	   <groupId>io.netty</groupId>
+      	   <artifactId>netty-transport-native-epoll</artifactId>
+      	   <version>4.0.25.Final</version>
+           <classifier>${os.detected.classifier}</classifier>
+    	</dependency>
     </dependencies>
 
 </project>
