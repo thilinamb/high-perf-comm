@@ -10,24 +10,24 @@
     <packaging>pom</packaging>
 
     <dependencyManagement>
-	<dependencies>
-	    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-      	<artifactId>log4j-api</artifactId>
-          	<version>2.3</version>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>2.3</version>
             </dependency>
             <dependency>
-            	<groupId>org.apache.logging.log4j</groupId>
-            	<artifactId>log4j-core</artifactId>
-            	<version>2.3</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>2.3</version>
             </dependency>
             <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.0.25.Final</version>
-        </dependency>
-	</dependencies>
-   </dependencyManagement>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>4.0.25.Final</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
@@ -40,7 +40,7 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-	    <plugin>
+            <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -59,6 +59,6 @@
 
     <modules>
         <module>nio</module>
-        <module>netty</module> 
+        <module>netty</module>
     </modules>
 </project>
