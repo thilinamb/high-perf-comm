@@ -21,7 +21,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<byte[]> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, byte[] bytes) throws Exception {
-        System.out.println("Got a message!");
         statCollector.updateStatistics(bytes.length);
     }
 
