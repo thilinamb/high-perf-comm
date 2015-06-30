@@ -55,7 +55,7 @@ public class NettyClient {
     }
 
     private static byte[] getRandomPayload() {
-        byte[] bytes = new byte[1024 * 100];
+        byte[] bytes = new byte[250];
         random.nextBytes(bytes);
         return bytes;
     }
