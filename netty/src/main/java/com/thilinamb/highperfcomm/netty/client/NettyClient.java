@@ -41,7 +41,7 @@ public class NettyClient {
             while (true) {
                 byte[] payload = getRandomPayload();
                 ChannelFuture future = channel.writeAndFlush(payload);
-                if (++i % 10000 == 0) {
+                if (++i % 100000 == 0) {
                     future.sync();
                 }
                 StatCollector.getInstance().updateStatistics(payload.length);
